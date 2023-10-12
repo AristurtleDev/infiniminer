@@ -44,7 +44,7 @@ namespace Infiniminer
                 FileStream file = new FileStream(filename, FileMode.Open, FileAccess.Read);
                 StreamReader sr = new StreamReader(file);
 
-                string line = sr.ReadLine();
+                string? line = sr.ReadLine();
                 while (line != null)
                 {
                     string[] args = line.Split("=".ToCharArray());
