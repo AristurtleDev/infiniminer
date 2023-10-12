@@ -39,7 +39,7 @@ namespace Infiniminer
             // Write the POST data.
             string paramString = EncodeParameters(parameters);
             byte[] bytes = Encoding.ASCII.GetBytes(paramString);
-            Stream os = null;
+            Stream? os = null;
 
             try
             {
