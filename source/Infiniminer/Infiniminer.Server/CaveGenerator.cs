@@ -41,7 +41,7 @@ namespace Infiniminer
             BlockType[,,] caveData = CaveGenerator.GenerateConstant(size, BlockType.Dirt);
 
             // Add ore.
-            float[,,] oreNoise = CaveGenerator.GeneratePerlinNoise(32);
+            float[,,]? oreNoise = CaveGenerator.GeneratePerlinNoise(32);
             oreNoise = InterpolateData(ref oreNoise, 32, size);
             for (int i = 0; i < oreFactor; i++)
                 CaveGenerator.PaintWithRandomWalk(ref caveData, ref oreNoise, size, 1, BlockType.Ore, false);
@@ -57,7 +57,7 @@ namespace Infiniminer
                 for (int y = 0; y < size; y++)
                     for (int z = 0; z <= Defines.GROUND_LEVEL * 2; z++)
                         mountainNoise[x, y, z] = z < 3 ? 0 : Math.Min(1, z / (Defines.GROUND_LEVEL * 2));
-            float[,,] gradient = CaveGenerator.GenerateGradient(size);
+            float[,,]? gradient = CaveGenerator.GenerateGradient(size);
             CaveGenerator.AddDataTo(ref mountainNoise, ref gradient, size, 0.1f, 0.9f);
             BlockType[,,] mountainData = CaveGenerator.GenerateConstant(size, BlockType.None);
             int numMountains = randGen.Next(size, size * 3);
@@ -70,7 +70,7 @@ namespace Infiniminer
                             caveData[x, y, z] = BlockType.None;
 
             // Carve some caves into the ground.
-            float[,,] caveNoise = CaveGenerator.GeneratePerlinNoise(32);
+            float[,,]? caveNoise = CaveGenerator.GeneratePerlinNoise(32);
             caveNoise = InterpolateData(ref caveNoise, 32, size);
             gradient = CaveGenerator.GenerateGradient(size);
             CaveGenerator.AddDataTo(ref caveNoise, ref gradient, size, 1 - gradientStrength, gradientStrength);
@@ -270,7 +270,7 @@ namespace Infiniminer
         {
             float[,,] data = new float[size, size, size];
 
-            float[,,] noise = null;
+            float[,,] noise;
             for (int f = 4; f < 32; f *= 2)
             {
                 noise = GenerateNoise(f, 2f / f);
