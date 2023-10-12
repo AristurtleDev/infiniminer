@@ -173,7 +173,7 @@ namespace Infiniminer
             }
         }
 
-        public Player(NetConnection netConn, Game gameInstance)
+        public Player(NetConnection netConn, Game? gameInstance)
         {
             this.gameInstance = gameInstance;
             this.NetConn = netConn;
