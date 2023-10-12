@@ -212,9 +212,7 @@ namespace Infiniminer
                                         }
                                         else
                                         {
-                                            Beacon newBeacon = new Beacon();
-                                            newBeacon.ID = text;
-                                            newBeacon.Team = team;
+                                            Beacon newBeacon = new Beacon(text, team);
                                             propertyBag.beaconList.Add(position, newBeacon);
                                         }
                                     }

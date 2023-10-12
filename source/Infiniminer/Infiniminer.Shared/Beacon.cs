@@ -25,8 +25,4 @@ SOFTWARE.
 
 namespace Infiniminer;
 
-public class Beacon
-{
-    public string ID;
-    public PlayerTeam Team;
-}
+public record Beacon(string ID, PlayerTeam Team);

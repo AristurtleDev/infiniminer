@@ -365,9 +365,9 @@ namespace Infiniminer
 
             if (blockType == BlockType.BeaconRed || blockType == BlockType.BeaconBlue)
             {
-                Beacon newBeacon = new Beacon();
-                newBeacon.ID = GenerateBeaconID();
-                newBeacon.Team = blockType == BlockType.BeaconRed ? PlayerTeam.Red : PlayerTeam.Blue;
+                string id = GenerateBeaconID();
+                PlayerTeam beaconTeam = blockType == BlockType.BeaconRed ? PlayerTeam.Red : PlayerTeam.Blue;
+                Beacon newBeacon = new Beacon(id, beaconTeam);
                 beaconList[new Vector3(x, y, z)] = newBeacon;
                 SendSetBeacon(new Vector3(x, y+1, z), newBeacon.ID, newBeacon.Team);
             }
