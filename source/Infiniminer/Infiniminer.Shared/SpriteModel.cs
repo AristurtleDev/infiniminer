@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ---------------------------------------------------------------------------- */
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -72,11 +73,11 @@ namespace Infiniminer
          * Whitespace is, of course, discarded when compiling animation scripts.
          */
 
-        Texture2D texSprite = null;
+        Texture2D texSprite;
         int numColumns = 0;
         int currentColumn = 0;
-        List<AnimationFrame> passiveAnimation = null;
-        List<AnimationFrame> activeAnimation = null;
+        List<AnimationFrame> passiveAnimation;
+        List<AnimationFrame> activeAnimation;
         int animationStep = 0;
         bool runningActive = false;
         float timeCountdown = 0;
@@ -84,19 +85,20 @@ namespace Infiniminer
         GraphicsDevice graphicsDevice;
         Effect effect;
         Game gameInstance;
-        SpriteFont nameFont = null;
+        SpriteFont nameFont;
 
         // Constructor for SpriteModel. Loads up the texture referenced by spriteSheetPath to use for drawing. 
         // Each individual sprite should be fit to a 24×32 box with the bottom center of the box corresponding to 
         // the SpriteModel's origin. A sprite sheet is expected to have a column of four sprites for every frame 
         // designated by numFrames. A sprite sheet should be 128 pixels tall and padded on the right to bring the 
         // total texture width to a power of two.
-        public SpriteModel(Game gameInstance, int numFrames)
+        public SpriteModel(Game gameInstance, int numFrames, Texture2D tex)
         {
             this.gameInstance = gameInstance;
             this.graphicsDevice = gameInstance.GraphicsDevice;
             this.effect = gameInstance.Content.Load<Effect>("effect_spritemodel");
             this.nameFont = gameInstance.Content.Load<SpriteFont>("font_04b08");
+            texSprite = tex;
 
             this.numColumns = numFrames;
 
@@ -111,6 +113,7 @@ namespace Infiniminer
             vertexDeclaration = new VertexDeclaration(VertexPositionTexture.VertexDeclaration.GetVertexElements());
         }
 
+        [MemberNotNull(nameof(texSprite))]
         public void SetSpriteTexture(Texture2D spriteTexture)
         {
             texSprite = spriteTexture;
@@ -312,10 +315,10 @@ namespace Infiniminer
         }
 
         // Raised when the currently playing animation script encounters an animation callback command.
-        public event EventHandler<AnimationCallbackEventArgs> RaiseAnimationCallbackEvent;
+        public event EventHandler<AnimationCallbackEventArgs>? RaiseAnimationCallbackEvent;
         protected void OnRaiseAnimationCallbackEvent(AnimationCallbackEventArgs e)
         {
-            EventHandler<AnimationCallbackEventArgs> handler = RaiseAnimationCallbackEvent;
+            EventHandler<AnimationCallbackEventArgs>? handler = RaiseAnimationCallbackEvent;
             if (handler != null)
                 handler(this, e);
         }
