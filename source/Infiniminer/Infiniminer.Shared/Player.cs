@@ -53,8 +53,8 @@ namespace Infiniminer
         public bool QueueAnimationBreak = false;
 
         // Things that affect animation.
-        public SpriteModel SpriteModel;
-        private Game gameInstance;
+        public SpriteModel? SpriteModel;
+        private Game? gameInstance;
 
         private bool idleAnimation = false;
         public bool IdleAnimation
@@ -68,9 +68,9 @@ namespace Infiniminer
                     if (gameInstance != null)
                     {
                         if (idleAnimation)
-                            SpriteModel.SetPassiveAnimation("1,0.2");
+                            SpriteModel?.SetPassiveAnimation("1,0.2");
                         else
-                            SpriteModel.SetPassiveAnimation("0,0.2;1,0.2;2,0.2;1,0.2");
+                            SpriteModel?.SetPassiveAnimation("0,0.2;1,0.2;2,0.2;1,0.2");
                     }
                 }
             }
@@ -168,7 +168,7 @@ namespace Infiniminer
                 {
                     usingTool = value;
                     if (usingTool == true && gameInstance != null)
-                        SpriteModel.StartActiveAnimation("3,0.15");
+                        SpriteModel?.StartActiveAnimation("3,0.15");
                 }
             }
         }
@@ -219,7 +219,7 @@ namespace Infiniminer
                     textureName += "pickaxe";
                     break;
             }
-            this.SpriteModel.SetSpriteTexture(gameInstance.Content.Load<Texture2D>(textureName));
+            SpriteModel?.SetSpriteTexture(gameInstance.Content.Load<Texture2D>(textureName));
         }
 
         static uint uniqueId = 0;
