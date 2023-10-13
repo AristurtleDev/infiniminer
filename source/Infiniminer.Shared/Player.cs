@@ -23,6 +23,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ---------------------------------------------------------------------------- */
 
+using LiteNetLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -41,7 +42,7 @@ namespace Infiniminer
         public List<Vector3> ExplosiveList = new List<Vector3>();
         public uint ID;
         public Vector3 Heading = Vector3.Zero;
-        public NetConnection NetConn;
+        public NetPeer NetPeer;
         public float TimeIdle = 0;
         public uint Score = 0;
         public float Ping = 0;
@@ -172,14 +173,14 @@ namespace Infiniminer
             }
         }
 
-        public Player(NetConnection netConn, Game? gameInstance)
+        public Player(NetPeer netPeer, Game? gameInstance)
         {
             this.gameInstance = gameInstance;
-            this.NetConn = netConn;
+            this.NetPeer = netPeer;
             this.ID = Player.GetUniqueId();
 
-            if (netConn != null)
-                this.IP = netConn.RemoteEndpoint.Address.ToString();
+            if (netPeer != null)
+                this.IP = netPeer.EndPoint.Address.ToString();
 
             if (gameInstance != null)
             {
