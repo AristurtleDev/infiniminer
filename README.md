@@ -27,15 +27,11 @@ At this time, the original source code has been ported to MonoGame 3.8.1.303 and
 To start a local server, run the `Infiniminer.Server` project.  
 To start a new client, run the `Infiniminer.Client` project.
 
-## Additional Notes
-To ensure the port was made smoothly, the version of Lidgren that was used in this port is version 1.0.0.0.  More information on why this was used can be found in the [Lidgren Readme](./source/Lidgren/README.md) file.
-
 ## LICENSE
 This repository consists of several parts, each of which have their own license or distribution information.  Each of these are listed below.  If you are the original author or license holder for any of these and you wish them to be removed from this repository, please contact me.
 
 - The main repository is licensed under the MIT License.  You can find the license text in the [LICENSE](./LICENSE) file.
 - Infiniminer is licensed under the MIT License.  You can find the license text for Infiniminer in the [Infiniminer License](./source/Infiniminer/LICENSE) file.
-- Lidgren is licensed under the MIT License.  You can find the license text for Lidgren in the [Lidgren License](./source/Lidgren/LICENSE) file.
 - The font `04B_03B_.TTF` is distributed as freeware according to the original freeware file included.  You can find this information in the [04B_03B_.TTF About](./source/Infiniminer/Infiniminer.Client/Content/04b_03b/about.gif) file.
 - The font `04B_08__.TTF` is distributed as freeware according to the original freeware file included.  You can find this information in the [04B_08__.TTF About](./source/Infiniminer/Infiniminer.Client/Content/04b_08/about.gif) file.
 - Artwork by Chris Gengler (tayrtahn@gmail.com)
