@@ -27,7 +27,7 @@ namespace Infiniminer.IO;
 
 public class ConfigurationFileReader : IDisposable
 {
-    private readonly FileStream _stream;
+    private readonly Stream _stream;
     private readonly StreamReader _reader;
     private bool _isDisposed;
 
@@ -40,6 +40,12 @@ public class ConfigurationFileReader : IDisposable
 
         _stream = File.OpenRead(path);
         _reader = new StreamReader(_stream);
+    }
+
+    public ConfigurationFileReader(Stream stream)
+    {
+        _stream = stream;
+        _reader = new StreamReader(stream);
     }
 
     ~ConfigurationFileReader() => Dispose(false);
