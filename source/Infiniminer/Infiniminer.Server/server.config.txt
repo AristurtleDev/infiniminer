@@ -29,8 +29,9 @@ IsPublic = false
 #######################################################################
 ### The size of the map generated in terms of total number of blocks for 
 ### width, depth, and height.
+### CURRENTLY MUST BE 64
 #######################################################################
-MapSize = 64;
+MapSize = 64
 
 #######################################################################
 ### The number of ore veins generated in the world.
