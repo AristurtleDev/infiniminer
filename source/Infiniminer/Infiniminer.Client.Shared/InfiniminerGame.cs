@@ -32,6 +32,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using Lidgren.Network;
 using Lidgren.Network.Xna;
+using Infiniminer.IO;
 
 namespace Infiniminer
 {
@@ -440,25 +441,54 @@ namespace Infiniminer
             graphicsDeviceManager.PreferredBackBufferHeight = 768;
             graphicsDeviceManager.PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8;
 
-            DatafileLoader dataFile = new DatafileLoader("client.config.txt");
-            if (dataFile.Data.ContainsKey("width"))
-                graphicsDeviceManager.PreferredBackBufferWidth = int.Parse(dataFile.Data["width"], System.Globalization.CultureInfo.InvariantCulture);
-            if (dataFile.Data.ContainsKey("height"))
-                graphicsDeviceManager.PreferredBackBufferHeight = int.Parse(dataFile.Data["height"], System.Globalization.CultureInfo.InvariantCulture);
-            if (dataFile.Data.ContainsKey("fullscreen"))
-                graphicsDeviceManager.IsFullScreen = bool.Parse(dataFile.Data["fullscreen"]);
-            if (dataFile.Data.ContainsKey("handle"))
-                playerHandle = dataFile.Data["handle"];
-            if (dataFile.Data.ContainsKey("showfps"))
-                DrawFrameRate = bool.Parse(dataFile.Data["showfps"]);
-            if (dataFile.Data.ContainsKey("yinvert"))
-                InvertMouseYAxis = bool.Parse(dataFile.Data["yinvert"]);
-            if (dataFile.Data.ContainsKey("nosound"))
-                NoSound = bool.Parse(dataFile.Data["nosound"]);
-            if (dataFile.Data.ContainsKey("pretty"))
-                RenderPretty = bool.Parse(dataFile.Data["pretty"]);
-            if (dataFile.Data.ContainsKey("volume"))
-                volumeLevel = Math.Max(0, Math.Min(1, float.Parse(dataFile.Data["volume"], System.Globalization.CultureInfo.InvariantCulture)));
+            using(ConfigurationFileReader reader = new ConfigurationFileReader(TitleContainer.OpenStream("client.config.txt")))
+            {
+                ConfigurationItem? item = null;
+
+                while((item = reader.ReadLine()) is not null)
+                {
+                    switch(item.Key)
+                    {
+                        case "width":
+                            graphicsDeviceManager.PreferredBackBufferWidth = int.Parse(item.Value, System.Globalization.CultureInfo.InvariantCulture);
+                            break;
+
+                        case "height":
+                            graphicsDeviceManager.PreferredBackBufferHeight = int.Parse(item.Value, System.Globalization.CultureInfo.InvariantCulture);
+                            break;
+
+                        case "fullscreen":
+                            graphicsDeviceManager.IsFullScreen = bool.Parse(item.Value);
+                            break;
+
+                        case "handle":
+                            playerHandle = item.Value;
+                            break;
+
+                        case "shofps":
+                            DrawFrameRate = bool.Parse(item.Value);
+                            break;
+
+                        case "yinvert":
+                            InvertMouseYAxis = bool.Parse(item.Value);
+                            break;
+                        
+                        case "nosound":
+                            NoSound = bool.Parse(item.Value);
+                            break;
+
+                        case "pretty":
+                            RenderPretty = bool.Parse(item.Value);
+                            break;
+
+                        case "volume":
+                            volumeLevel = Math.Max(0, Math.Min(1, float.Parse(item.Value, System.Globalization.CultureInfo.InvariantCulture)));
+                            break;
+
+                        default: continue;
+                    }
+                }
+            }
 
             graphicsDeviceManager.ApplyChanges();
             base.Initialize();
