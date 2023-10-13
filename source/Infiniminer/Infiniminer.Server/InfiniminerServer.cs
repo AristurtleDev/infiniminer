@@ -26,8 +26,6 @@ SOFTWARE.
 using System.Diagnostics;
 using System.Linq.Expressions;
 using Infiniminer.IO;
-using Lidgren.Network;
-using Lidgren.Network.Xna;
 using Microsoft.Xna.Framework;
 
 namespace Infiniminer

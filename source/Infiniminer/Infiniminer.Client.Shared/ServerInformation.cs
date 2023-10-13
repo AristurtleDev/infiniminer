@@ -24,7 +24,6 @@ SOFTWARE.
 ---------------------------------------------------------------------------- */
 
 using System.Net;
-using Lidgren.Network;
 
 namespace Infiniminer
 {

@@ -27,8 +27,6 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Lidgren.Network;
-using Lidgren.Network.Xna;
 
 namespace Infiniminer
 {

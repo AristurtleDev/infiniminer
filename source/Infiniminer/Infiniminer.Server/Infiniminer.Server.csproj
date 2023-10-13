@@ -26,8 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Infiniminer.Shared\Infiniminer.Shared.csproj" />
-    <ProjectReference Include="..\..\Lidgren\Lidgren.Network\Lidgren.Network.csproj" />
-    <ProjectReference Include="..\..\Lidgren\Lidgren.Network.Xna\Lidgren.Network.Xna.csproj" />
   </ItemGroup>
 
 </Project>

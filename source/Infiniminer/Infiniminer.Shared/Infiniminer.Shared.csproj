@@ -18,9 +18,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\Lidgren\Lidgren.Network\Lidgren.Network.csproj" />
-    <ProjectReference Include="..\..\Lidgren\Lidgren.Network.Xna\Lidgren.Network.Xna.csproj" />
-  </ItemGroup>
-
 </Project>

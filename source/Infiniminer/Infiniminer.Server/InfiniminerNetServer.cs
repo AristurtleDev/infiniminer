@@ -23,8 +23,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ---------------------------------------------------------------------------- */
 
-using Lidgren.Network;
-
 namespace Infiniminer
 {
     public class InfiniminerNetServer : NetServer
