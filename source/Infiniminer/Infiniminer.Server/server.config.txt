@@ -1,18 +1,55 @@
-servername = Unnamed Server
-maxplayers = 16
+#######################################################################
+### The display name of this server as shown in the client server list.
+#######################################################################
+ServerName = Unnamed Server
 
-# Before making your server public, MAKE SURE THAT PORT 5565 (TCP/UDP) IS ACCESSIBLE FROM THE OUTSIDE OF YOUR NETWORK!
-# For most users, this means setting the port to be forwarded by your router through your router control interface.
-public = false
+#######################################################################
+### The maximum number of player connections allowed by this server.
+#######################################################################
+MaxPlayers = 16
 
-# This value specifies the amount of cash required for a team to win the game.
-winningcash = 10000
+#######################################################################
+### The port number used to connect to this server
+#######################################################################
+Port = 5565
 
-# This flag specifies whether or not generated levels will include lava.
-includelava = true
+#######################################################################
+### When true, this server will be listed as an avaialble server for 
+### clients to connect tofrom the public server listing host configured 
+### below.
+#######################################################################
+IsPublic = false
 
-# This value specifies the number of ore veins found in the world.
-orefactor = 10
+#######################################################################
+### The hostname or IPv4 address of the public server listing host to 
+### list this server on.
+#######################################################################
+# PublicHost = example.com
 
-# If this flag is true, all blocks will be free and the game will be unwinnable.
-sandbox = false
+#######################################################################
+### The size of the map generated in terms of total number of blocks for 
+### width, depth, and height.
+#######################################################################
+MapSize = 64;
+
+#######################################################################
+### The number of ore veins generated in the world.
+#######################################################################
+OreFactor = 10
+
+#######################################################################
+### This flag specifies whether or not the generated world will include
+### lava blocks.
+#######################################################################
+IncludeLava = true
+
+#######################################################################
+### The total amount of cash required for a team to win the game.
+#######################################################################
+WinningCashAmount = 10000
+
+#######################################################################
+### This flag indicates if sandbox mode is enabled. When sandbox mode
+### is enabled, all blocks will be free and the game will be unwinnable.
+#######################################################################
+SandboxMode = false

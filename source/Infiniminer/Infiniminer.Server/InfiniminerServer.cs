@@ -24,6 +24,8 @@ SOFTWARE.
 ---------------------------------------------------------------------------- */
 
 using System.Diagnostics;
+using System.Linq.Expressions;
+using Infiniminer.IO;
 using Lidgren.Network;
 using Lidgren.Network.Xna;
 using Microsoft.Xna.Framework;
@@ -35,15 +37,9 @@ namespace Infiniminer
         InfiniminerNetServer? netServer;
         BlockType[,,] blockList;    // In game coordinates, where Y points up.
         PlayerTeam[,,] blockCreatorTeam;
-        const int MAPSIZE = 64;
         Dictionary<NetConnection, Player> playerList = new Dictionary<NetConnection, Player>();
+        ServerConfig config;
         int lavaBlockCount = 0;
-        uint oreFactor = 10;
-        bool publicServer = false;
-        uint maxPlayers = 16;
-        string serverName = "Unnamed Server";
-        bool sandboxMode = false;
-        bool includeLava = true;
         DateTime lastServerListUpdate = DateTime.Now;
         List<string>? banList;
 
@@ -69,32 +65,32 @@ namespace Infiniminer
 
         public InfiniminerServer()
         {
-            blockList = new BlockType[0,0,0];
-            blockCreatorTeam = new PlayerTeam[0,0,0];
+            blockList = new BlockType[0, 0, 0];
+            blockCreatorTeam = new PlayerTeam[0, 0, 0];
         }
 
         public string GetExtraInfo()
         {
             string extraInfo = "";
-            if (sandboxMode)
+            if (config.SandboxMode)
                 extraInfo += "sandbox";
             else
                 extraInfo += string.Format("{0:#.##k}", winningCashAmount / 1000);
-            if (!includeLava)
+            if (!config.IncludeLava)
                 extraInfo += ", !lava";
             return extraInfo;
         }
 
         public void PublicServerListUpdate()
         {
-            if (!publicServer)
+            if (!config.IsPublic)
                 return;
 
             Dictionary<string, string> postDict = new Dictionary<string, string>();
-            postDict["name"] = serverName;
+            postDict["name"] = config.ServerName;
             postDict["game"] = "INFINIMINER";
             postDict["player_count"] = "" + playerList.Keys.Count;
-            postDict["player_capacity"] = "" + maxPlayers;
+            postDict["player_capacity"] = "" + config.MaxPlayers;
             postDict["extra"] = GetExtraInfo();
 
             try
@@ -365,7 +361,7 @@ namespace Infiniminer
 
         public void SetBlock(ushort x, ushort y, ushort z, BlockType blockType, PlayerTeam team)
         {
-            if (x <= 0 || y <= 0 || z <= 0 || x >= MAPSIZE - 1 || y >= MAPSIZE - 1 || z >= MAPSIZE - 1)
+            if (x <= 0 || y <= 0 || z <= 0 || x >= config.MapSize - 1 || y >= config.MapSize - 1 || z >= config.MapSize - 1)
                 return;
 
             if (blockType == BlockType.BeaconRed || blockType == BlockType.BeaconBlue)
@@ -404,43 +400,79 @@ namespace Infiniminer
             //ConsoleWrite("BLOCKSET: " + x + " " + y + " " + z + " " + blockType.ToString());
         }
 
+        private void LoadServerConfig()
+        {
+            config = new ServerConfig();
+            using ConfigurationFileReader reader = new ConfigurationFileReader("server.config.txt");
+
+            ConfigurationItem? item = null;
+            while((item = reader.ReadLine()) is not null)
+            {
+                switch(item.Key)
+                {
+                    case nameof(ServerConfig.ServerName):
+                        config.ServerName = item.Value;
+                        break;
+
+                    case nameof(ServerConfig.MaxPlayers):
+                        config.MaxPlayers = uint.Parse(item.Value, System.Globalization.CultureInfo.InvariantCulture);
+                        break;
+
+                    case nameof(ServerConfig.Port):
+                        config.Port = int.Parse(item.Value, System.Globalization.CultureInfo.InvariantCulture);
+                        break;
+
+                    case nameof(ServerConfig.IsPublic):
+                        config.IsPublic = bool.Parse(item.Value);
+                        break;
+
+                    case nameof(ServerConfig.PublicHost):
+                        config.PublicHost = item.Value;
+                        break;
+
+                    case nameof(ServerConfig.MapSize):
+                        config.MapSize = int.Parse(item.Value, System.Globalization.CultureInfo.InvariantCulture);
+                        break;
+
+                    case nameof(ServerConfig.OreFactor):
+                        config.OreFactor = uint.Parse(item.Value, System.Globalization.CultureInfo.InvariantCulture);
+                        break;
+
+                    case nameof(ServerConfig.IncludeLava):
+                        config.IncludeLava = bool.Parse(item.Value);
+                        break;
+                    
+                    case nameof(ServerConfig.SandboxMode):
+                        config.SandboxMode = bool.Parse(item.Value);
+                        break;
+
+                    default: continue;
+                }
+            }
+        }
+
         public bool Start()
         {
-            // Read in from the config file.
-            DatafileLoader dataFile = new DatafileLoader("server.config.txt");
-            if (dataFile.Data.ContainsKey("winningcash"))
-                winningCashAmount = uint.Parse(dataFile.Data["winningcash"], System.Globalization.CultureInfo.InvariantCulture);
-            if (dataFile.Data.ContainsKey("includelava"))
-                includeLava = bool.Parse(dataFile.Data["includelava"]);
-            if (dataFile.Data.ContainsKey("orefactor"))
-                oreFactor = uint.Parse(dataFile.Data["orefactor"], System.Globalization.CultureInfo.InvariantCulture);
-            if (dataFile.Data.ContainsKey("maxplayers"))
-                maxPlayers = Math.Min(32, uint.Parse(dataFile.Data["maxplayers"], System.Globalization.CultureInfo.InvariantCulture));
-            if (dataFile.Data.ContainsKey("public"))
-                publicServer = bool.Parse(dataFile.Data["public"]);
-            if (dataFile.Data.ContainsKey("servername"))
-                serverName = dataFile.Data["servername"];
-            if (dataFile.Data.ContainsKey("sandbox"))
-                sandboxMode = bool.Parse(dataFile.Data["sandbox"]);
+            LoadServerConfig();
 
             // Load the ban-list.
             banList = LoadBanList();
 
             // Create our block world, translating the coordinates out of the cave generator (where Z points down)
-            BlockType[,,] worldData = CaveGenerator.GenerateCaveSystem(MAPSIZE, includeLava, oreFactor);
-            blockList = new BlockType[MAPSIZE, MAPSIZE, MAPSIZE];
-            blockCreatorTeam = new PlayerTeam[MAPSIZE, MAPSIZE, MAPSIZE];
-            for (ushort i = 0; i < MAPSIZE; i++)
-                for (ushort j = 0; j < MAPSIZE; j++)
-                    for (ushort k = 0; k < MAPSIZE; k++)
+            BlockType[,,] worldData = CaveGenerator.GenerateCaveSystem(config.MapSize, config.IncludeLava, config.OreFactor);
+            blockList = new BlockType[config.MapSize, config.MapSize, config.MapSize];
+            blockCreatorTeam = new PlayerTeam[config.MapSize, config.MapSize, config.MapSize];
+            for (ushort i = 0; i < config.MapSize; i++)
+                for (ushort j = 0; j < config.MapSize; j++)
+                    for (ushort k = 0; k < config.MapSize; k++)
                     {
-                        blockList[i, (ushort)(MAPSIZE - 1 - k), j] = worldData[i, j, k];
+                        blockList[i, (ushort)(config.MapSize - 1 - k), j] = worldData[i, j, k];
                         blockCreatorTeam[i, j, k] = PlayerTeam.None;
                     }
 
             // Initialize the server.
             NetConfiguration netConfig = new NetConfiguration("InfiniminerPlus");
-            netConfig.MaxConnections = (int)maxPlayers;
+            netConfig.MaxConnections = (int)config.MaxPlayers;
             netConfig.Port = 5565;
             netServer = new InfiniminerNetServer(netConfig);
             netServer.SetMessageTypeEnabled(NetMessageType.ConnectionApproval, true);
@@ -460,7 +492,7 @@ namespace Infiniminer
 
             // Calculate initial lava flows.
             ConsoleWrite("CALCULATING INITIAL LAVA FLOWS");
-            for (int i = 0; i < MAPSIZE * 2; i++)
+            for (int i = 0; i < config.MapSize * 2; i++)
                 DoLavaStuff();
             ConsoleWrite("TOTAL LAVA BLOCKS = " + lavaBlockCount);
 
@@ -800,7 +832,7 @@ namespace Infiniminer
                     DepositCash(p);
             }
 
-            if (sandboxMode)
+            if (config.SandboxMode)
                 return;
             if (teamCashBlue >= winningCashAmount && winningTeam == PlayerTeam.None)
                 winningTeam = PlayerTeam.Blue;
@@ -810,16 +842,16 @@ namespace Infiniminer
 
         public void DoLavaStuff()
         {
-            bool[,,] flowSleep = new bool[MAPSIZE, MAPSIZE, MAPSIZE]; //if true, do not calculate this turn
+            bool[,,] flowSleep = new bool[config.MapSize, config.MapSize, config.MapSize]; //if true, do not calculate this turn
 
-            for (ushort i = 0; i < MAPSIZE; i++)
-                for (ushort j = 0; j < MAPSIZE; j++)
-                    for (ushort k = 0; k < MAPSIZE; k++)
+            for (ushort i = 0; i < config.MapSize; i++)
+                for (ushort j = 0; j < config.MapSize; j++)
+                    for (ushort k = 0; k < config.MapSize; k++)
                         flowSleep[i, j, k] = false;
 
-            for (ushort i = 0; i < MAPSIZE; i++)
-                for (ushort j = 0; j < MAPSIZE; j++)
-                    for (ushort k = 0; k < MAPSIZE; k++)
+            for (ushort i = 0; i < config.MapSize; i++)
+                for (ushort j = 0; j < config.MapSize; j++)
+                    for (ushort k = 0; k < config.MapSize; k++)
                         if (blockList[i, j, k] == BlockType.Lava && !flowSleep[i, j, k])
                         {
                             // RULES FOR LAVA EXPANSION:
@@ -847,12 +879,12 @@ namespace Infiniminer
                                     SetBlock(i, j, (ushort)(k - 1), BlockType.Lava, PlayerTeam.None);
                                     flowSleep[i, j, k - 1] = true;
                                 }
-                                if (i < MAPSIZE - 1 && blockList[i + 1, j, k] == BlockType.None)
+                                if (i < config.MapSize - 1 && blockList[i + 1, j, k] == BlockType.None)
                                 {
                                     SetBlock((ushort)(i + 1), j, k, BlockType.Lava, PlayerTeam.None);
                                     flowSleep[i + 1, j, k] = true;
                                 }
-                                if (k < MAPSIZE - 1 && blockList[i, j, k + 1] == BlockType.None)
+                                if (k < config.MapSize - 1 && blockList[i, j, k + 1] == BlockType.None)
                                 {
                                     SetBlock(i, j, (ushort)(k + 1), BlockType.Lava, PlayerTeam.None);
                                     flowSleep[i, j, k + 1] = true;
@@ -866,7 +898,7 @@ namespace Infiniminer
             ushort x = (ushort)point.X;
             ushort y = (ushort)point.Y;
             ushort z = (ushort)point.Z;
-            if (x <= 0 || y <= 0 || z <= 0 || x >= MAPSIZE - 1 || y >= MAPSIZE - 1 || z >= MAPSIZE - 1)
+            if (x <= 0 || y <= 0 || z <= 0 || x >= config.MapSize - 1 || y >= config.MapSize - 1 || z >= config.MapSize - 1)
                 return BlockType.None;
             return blockList[x, y, z];
         }
@@ -993,7 +1025,7 @@ namespace Infiniminer
 
             // If the block is too expensive, bail.
             uint blockCost = BlockInformation.GetCost(blockType);
-            if (sandboxMode && blockCost <= player.OreMax)
+            if (config.SandboxMode && blockCost <= player.OreMax)
                 blockCost = 0;
             if (blockCost > player.Ore)
                 actionFailed = true;
@@ -1009,7 +1041,7 @@ namespace Infiniminer
             }
 
             // If it's out of bounds, bail.
-            if (x <= 0 || y <= 0 || z <= 0 || x >= MAPSIZE - 1 || y >= MAPSIZE - 1 || z >= MAPSIZE - 1)
+            if (x <= 0 || y <= 0 || z <= 0 || x >= config.MapSize - 1 || y >= config.MapSize - 1 || z >= config.MapSize - 1)
                 actionFailed = true;
 
             // If it's near a base, bail.
@@ -1142,7 +1174,7 @@ namespace Infiniminer
                     for (int dz = -2; dz <= 2; dz++)
                     {
                         // Check that this is a sane block position.
-                        if (x + dx <= 0 || y + dy <= 0 || z + dz <= 0 || x + dx >= MAPSIZE - 1 || y + dy >= MAPSIZE - 1 || z + dz >= MAPSIZE - 1)
+                        if (x + dx <= 0 || y + dy <= 0 || z + dz <= 0 || x + dx >= config.MapSize - 1 || y + dy >= config.MapSize - 1 || z + dz >= config.MapSize - 1)
                             continue;
 
                         // Chain reactions!
@@ -1232,7 +1264,7 @@ namespace Infiniminer
 
             player.Score += player.Cash;
 
-            if (!sandboxMode)
+            if (!config.SandboxMode)
             {
                 if (player.Team == PlayerTeam.Red)
                     teamCashRed += player.Cash;
@@ -1297,17 +1329,17 @@ namespace Infiniminer
 
         public void SendCurrentMap(NetConnection client)
         {
-            Debug.Assert(MAPSIZE == 64, "The BlockBulkTransfer message requires a map size of 64.");
+            Debug.Assert(config.MapSize == 64, "The BlockBulkTransfer message requires a map size of 64.");
 
-            for (byte x = 0; x < MAPSIZE; x++)
-                for (byte y = 0; y < MAPSIZE; y += 16)
+            for (byte x = 0; x < config.MapSize; x++)
+                for (byte y = 0; y < config.MapSize; y += 16)
                 {
                     NetBuffer? msgBuffer = netServer?.CreateBuffer();
                     msgBuffer?.Write((byte)InfiniminerMessage.BlockBulkTransfer);
                     msgBuffer?.Write(x);
                     msgBuffer?.Write(y);
                     for (byte dy = 0; dy < 16; dy++)
-                        for (byte z = 0; z < MAPSIZE; z++)
+                        for (byte z = 0; z < config.MapSize; z++)
                             msgBuffer?.Write((byte)(blockList[x, y + dy, z]));
                     if (client.Status == NetConnectionStatus.Connected)
                         netServer?.SendMessage(msgBuffer, client, NetChannel.ReliableUnordered);
