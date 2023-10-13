@@ -65,7 +65,7 @@ public class ConfigurationFileReader : IDisposable
             if (kv.Length == 2)
             {
                 key = kv[0].Trim();
-                value = kv[0].Trim();
+                value = kv[1].Trim();
             }
         }
 
