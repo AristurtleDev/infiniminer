@@ -1,0 +1,77 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <TargetFramework>net8.0-android</TargetFramework>
+    <ProjectGuid>d0c0c105-11d2-4f58-aed4-81ffdb30185b</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <IsTrimmable>True</IsTrimmable>
+	<TrimMode>partial</TrimMode>
+    <RootNamespace>Infiniminer</RootNamespace>
+    <AssemblyName>Infiniminer</AssemblyName>
+    <KniPlatform>Android</KniPlatform>
+    <ApplicationId>com.companyname.$ext_safeprojectname$</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <AndroidStoreUncompressedFileExtensions>.m4a</AndroidStoreUncompressedFileExtensions>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Version>1.0.0.0</Version>
+    <Title>Infiniminer</Title>
+    <Copyright>Copyright (c) 2009 Zach Barth</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AndroidAsset Include="../Infiniminer.Client.Shared/client.config.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="nkast.Xna.Framework" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Content" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Devices" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Graphics" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Audio" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Media" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Input" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Game" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Storage" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.XR" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Kni.Platform.Oculus.GL" Version="4.0.9001.*" />
+    <PackageReference Include="nkast.Xna.Framework.Content.Pipeline.Builder" Version="4.0.9001.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="InfiniminerActivity.cs" />
+    <Compile Include="Infiniminer3DVRGame.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AndroidManifest.xml" />
+    <None Include="Assets\AboutAssets.txt" />
+    <None Include="Resources\AboutResources.txt" />
+    <AndroidResource Include="Resources\Drawable\Icon.png" />
+    <AndroidResource Include="Resources\Drawable\Splash.png" />
+    <AndroidResource Include="Resources\Values\Strings.xml" />
+    <AndroidResource Include="Resources\Values\Styles.xml" />
+    <Folder Include="Resources\Layout\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Infiniminer.Client.Shared\Infiniminer.Client.Shared.Kni.csproj" />
+    <KniContentReference Include="..\Infiniminer.Client.Shared\Content\Content.Shared.mgcb" Link="Content\Content.Shared.mgcb" />
+    <KniContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  
+  <Target Name="RestoreDotnetTools" BeforeTargets="Restore">
+    <Message Text="Restoring dotnet tools" Importance="High" />
+    <Exec Command="dotnet tool restore" />
+  </Target>
+
+</Project>
